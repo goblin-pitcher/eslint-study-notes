@@ -11,7 +11,7 @@
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
   meta: {
-    type: null, // `problem`, `suggestion`, or `layout`
+    type: 'suggestion', // `problem`, `suggestion`, or `layout`
     docs: {
       description: "递归的异步方法导致内存泄露的检测",
       recommended: false,
@@ -19,6 +19,9 @@ module.exports = {
     },
     fixable: null, // Or `code` or `whitespace`
     schema: [], // Add a schema if the rule has options
+    messages: {
+      someMessageId: 'this is a function',
+    },
   },
 
   create(context) {
@@ -37,8 +40,12 @@ module.exports = {
     return {
       // visitor functions for different types of nodes
       FunctionDeclaration(node) {
-        console.log('===>', context.getScope())
-      }
+        console.log('===>', context.getScope(), node)
+        context.report({
+          node,
+          messageId: 'someMessageId'
+        })
+      },
     };
   },
 };

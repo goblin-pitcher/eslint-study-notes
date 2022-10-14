@@ -1,0 +1,22 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      // "source.fixAll.stylelint": true
+  },
+  // "eslint.codeActionsOnSave.mode": "problems",
+  // "js/ts.implicitProjectConfig.experimentalDecorators": true,
+  // "stylelint.snippet": [
+  //   "css",
+  //   "less",
+  //   "postcss",
+  //   "scss"
+  // ],
+  // "stylelint.validate": [
+  //   "css",
+  //   "less",
+  //   "postcss",
+  //   "scss"
+  // ] // roadhog支持装饰器写法，取消vscode对装饰器写法的报错
+}
