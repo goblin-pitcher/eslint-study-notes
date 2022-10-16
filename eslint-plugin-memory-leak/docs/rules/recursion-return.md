@@ -1,4 +1,4 @@
-# 递归的异步方法导致内存泄露的检测 (async-recursion)
+# 递归的没有return导致内存泄露的检测 (recursion-return)
 
 Please describe the origin of the rule here.
 

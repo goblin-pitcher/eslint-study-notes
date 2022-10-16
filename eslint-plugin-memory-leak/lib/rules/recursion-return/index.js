@@ -37,6 +37,8 @@ module.exports = {
     // Public
     //----------------------------------------------------------------------
 
+
+
     return {
       // visitor functions for different types of nodes
       FunctionDeclaration(node) {
@@ -46,6 +48,9 @@ module.exports = {
           messageId: 'someMessageId'
         })
       },
+      CallExpression(node) {
+
+      }
     };
   },
 };

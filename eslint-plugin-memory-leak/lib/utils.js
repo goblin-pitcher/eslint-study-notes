@@ -1,12 +1,23 @@
-const traverse = (node, findFunc = () => false, ignoreFunc = ()=>false) => {
-    const checkItems = [].concat(node.body||[]);
+const genTraverse = (options = {}) => (node) => {
+    const {
+        childKey = 'children',
+        findFunc = () => false ,
+        ignoreFunc = ()=>false,
+        returnFindVal = false
+    } = options;
+    const getChildren = typeof childKey === 'function'
+                        ? (item) => childKey(item) || []
+                        : (item) => item[childKey] || [];
+
+    const checkItems = [].concat(getChildren(node));
     while(checkItems.length) {
         const item = checkItems.shift();
         if(ignoreFunc(item)) continue;
-        if(findFunc(item)) {
-            return item
+        const findVal = findFunc(item);
+        if(findVal) {
+            return returnFindVal ? findVal : item;
         }
-        checkItems.unshift(...([].concat(item.body||[])))
+        checkItems.unshift(...([].concat(getChildren(item))))
     }
     return null;
 }
@@ -20,6 +31,18 @@ const relationhandler = {
     }
 }
 
+const isDef = (val) => !!(val || val===0);
+const getByPath = (obj, path = []) => {
+    path = [].concat(path).filter(isDef);
+    let findVal = obj;
+    for(const key of path) {
+        if(!findVal) return findVal;
+        findVal = findVal[key]
+    }
+    return findVal
+}
 
-exports.traverse = traverse;
-exports.relationhandler = relationhandler
+exports.genTraverse = genTraverse;
+exports.relationhandler = relationhandler;
+exports.isDef = isDef;
+exports.getByPath = getByPath;

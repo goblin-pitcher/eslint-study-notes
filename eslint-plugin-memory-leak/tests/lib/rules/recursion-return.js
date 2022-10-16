@@ -8,7 +8,7 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const rule = require("../../../lib/rules/async-recursion"),
+const rule = require("../../../lib/rules/recursion-return"),
   RuleTester = require("eslint").RuleTester;
 
 
@@ -17,7 +17,7 @@ const rule = require("../../../lib/rules/async-recursion"),
 //------------------------------------------------------------------------------
 
 const ruleTester = new RuleTester();
-ruleTester.run("async-recursion", rule, {
+ruleTester.run("recursion-return", rule, {
   valid: [
     // give me some code that won't trigger a warning
   ],
