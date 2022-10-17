@@ -33,7 +33,7 @@ const genGetFuncExpression = (context) => {
     const getObjectValue = (node, path = []) => {
         if(!node || node.type !== 'ObjectExpression') return null;
         let item = node;
-        for(let i=0; i<=path.length; i++) {
+        for(let i=0; i<path.length; i++) {
             const findKey = path[i];
             const findItem = item && (item.properties || []).find(n=>n.key && n.key.name === findKey)
             if(!findItem) return null;
@@ -47,7 +47,7 @@ const genGetFuncExpression = (context) => {
         let item = node;
         while(item.type === calleeTypeEnum.MemberExpression) {
             path.unshift(item.property.name);
-            item = node.object
+            item = item.object
         }
         if(item.type === calleeTypeEnum.Identifier) {
             return {
@@ -67,48 +67,47 @@ const genGetFuncExpression = (context) => {
     }
     const findFuncHandler = {
         Identifier: (node) => {
+            if(node && Object.values(funcTypeEnum).includes(node.type)) {
+                return node;
+            }
             if(!node || node.type !== calleeTypeEnum.Identifier) return null;
+
             const scope = context.getScope(node);
             const findNode = findNodeByName(scope, node.name);
             if(!findNode) {
                 return null
             }
-            if(findNode.type === calleeTypeEnum.Identifier) return findFuncHandler.Identifier(node);
-            if(findNode.type === calleeTypeEnum.MemberExpression) return findFuncHandler.MemberExpression(node);
-            
-          if(Object.values(funcTypeEnum).includes(findNode.type)) return findNode;
-
-            return null
+          return findFuncHandler.Identifier(findNode)||findFuncHandler.MemberExpression(findNode);
         },
 
         MemberExpression: (node) => {
+            if(node && Object.values(funcTypeEnum).includes(node.type)) {
+                return node;
+            }
             if(!node || node.type !== calleeTypeEnum.MemberExpression) return null;
+
             const info = getNodeAndPath(node);
-            if(!info) return null;
             const {id, path, thisExpression} = info;
             let findNode;
             if(thisExpression) {
                 const classProperty = [...context.getAncestors()].reverse()
                     .find(item=>["ClassProperty", 'MethodDefinition'].includes(item.type) && item.key.name === path[0])
-                
                 findNode = classProperty.value;
+              
             } else {
                 const scope = context.getScope();
                 findNode = findNodeByName(scope, id.name);
                 if(!findNode) return null;
-                if(findNode.type === calleeTypeEnum.Identifier) {
-                    findNode = findFuncHandler.Identifier(node);
-                }else if(findNode.type === calleeTypeEnum.MemberExpression) {
+                if(findNode.type === calleeTypeEnum.MemberExpression) {
                     findNode = findFuncHandler.MemberExpression(findNode);
+
                 }
-                if(findNode && path.length) {
-                    findNode = getObjectValue(findNode, path)
-                }
+            	if(findNode && path.length) {
+               		findNode = getObjectValue(findNode, path)
+              
+            	}
             }
-            if(findNode && Object.values(funcTypeEnum).includes(findNode.type)) {
-                return findNode;
-            }
-            return null;
+            return findFuncHandler.Identifier(findNode)||findFuncHandler.MemberExpression(findNode);
         }
     }
 
