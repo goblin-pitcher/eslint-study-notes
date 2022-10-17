@@ -1,3 +1,22 @@
+const {genTraverse, relationhandler} = require('../../utils');
+const genGetFuncExpression = require('./gen-get-func-expression');
+
+
+const findReturnStatement = (root) => {
+  const statementChildKeyEnum = {
+    IfStatement: 'consequent',
+    SwitchStatement: 'cases'
+  }
+  const childKey = (item)=> item[statementChildKeyEnum[item.type] || 'body'] || [];
+  const ignoreFunc = (node) => !node.type.endsWith('Statement') && node !== root
+  const findFunc = (node) => node.type === 'ReturnStatement'
+  return genTraverse({
+      childKey,
+      ignoreFunc,
+      findFunc
+  })(root)
+}
+
 /**
  * @fileoverview 递归的异步方法导致内存泄露的检测
  * @author xiao.wei
@@ -20,11 +39,12 @@ module.exports = {
     fixable: null, // Or `code` or `whitespace`
     schema: [], // Add a schema if the rule has options
     messages: {
-      someMessageId: 'this is a function',
+      someMessageId: '检测到递归引用，且方法不包含return，可能会有内存泄漏风险',
     },
   },
 
   create(context) {
+    const getFuncExpression = genGetFuncExpression(context);
     // variables should be defined here
 
     //----------------------------------------------------------------------
@@ -41,15 +61,17 @@ module.exports = {
 
     return {
       // visitor functions for different types of nodes
-      FunctionDeclaration(node) {
-        console.log('===>', context.getScope(), node)
-        context.report({
-          node,
-          messageId: 'someMessageId'
-        })
-      },
       CallExpression(node) {
-
+        const findFunc = getFuncExpression(node);
+        if(findFunc && relationhandler.isContain(findFunc, node.callee)) {
+          const returnStatement = findReturnStatement(findFunc);
+          if(!(returnStatement && relationhandler.isPrev(returnStatement, node.callee))) {
+            context.report({
+              node,
+              messageId: 'someMessageId'
+            })
+          }
+        }
       }
     };
   },

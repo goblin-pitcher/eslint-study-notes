@@ -9,7 +9,7 @@ const genTraverse = (options = {}) => (node) => {
                         ? (item) => childKey(item) || []
                         : (item) => item[childKey] || [];
 
-    const checkItems = [].concat(getChildren(node));
+    const checkItems = [].concat(node);
     while(checkItems.length) {
         const item = checkItems.shift();
         if(ignoreFunc(item)) continue;

@@ -2,9 +2,9 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true,
+      "source.fixAll.eslint": true
       // "source.fixAll.stylelint": true
-  },
+  }
   // "eslint.codeActionsOnSave.mode": "problems",
   // "js/ts.implicitProjectConfig.experimentalDecorators": true,
   // "stylelint.snippet": [
