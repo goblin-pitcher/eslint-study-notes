@@ -10,7 +10,7 @@ class Test {
 	  }
 	  const a = this.f;
 	  const o = {f: {a}}
-		o.f.a()
+	  return o.f.a()
 	  
 	   while(true) {
 		  return
@@ -18,10 +18,14 @@ class Test {
 	}
 }
 
-const f = ()=>{
-	if(true) {
-		return
-	}
-	f()
+function f1() {
+	f2()
+}
+function f2() {
+	f3(3)
+}
+
+function f3() {
+	f1()
 }
 

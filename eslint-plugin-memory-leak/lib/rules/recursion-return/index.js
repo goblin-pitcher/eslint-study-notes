@@ -1,22 +1,8 @@
-const {genTraverse, relationhandler} = require('../../utils');
+const {relationhandler} = require('../../utils');
+const {findReturnStatement} = require('./utils');
 const genGetFuncExpression = require('./gen-get-func-expression');
-
-
-const findReturnStatement = (root) => {
-  const statementChildKeyEnum = {
-    IfStatement: 'consequent',
-    SwitchStatement: 'cases'
-  }
-  const childKey = (item)=> item[statementChildKeyEnum[item.type] || 'body'] || [];
-  const ignoreFunc = (node) => !node.type.endsWith('Statement') && node !== root
-  const findFunc = (node) => node.type === 'ReturnStatement'
-  return genTraverse({
-      childKey,
-      ignoreFunc,
-      findFunc
-  })(root)
-}
-
+const {funcTypeEnum} = require('./const')
+const Diagraph = require('./Digraph');
 /**
  * @fileoverview 递归的异步方法导致内存泄露的检测
  * @author xiao.wei
@@ -45,6 +31,23 @@ module.exports = {
 
   create(context) {
     const getFuncExpression = genGetFuncExpression(context);
+    const diagraph = new Diagraph();
+    const funcHandler = Object.values(funcTypeEnum).reduce((obj, key)=>{
+      obj[key] = (node) => {
+        diagraph.goDown(node)
+      }
+      obj[`${key}:exit`] = (node) => {
+        const isCycle = diagraph.checkCycle();
+        if(isCycle) {
+          context.report({
+            node,
+            messageId: 'someMessageId'
+          })
+        }
+        diagraph.back(node);
+      }
+      return obj;
+    }, {})
     // variables should be defined here
 
     //----------------------------------------------------------------------
@@ -60,16 +63,16 @@ module.exports = {
 
 
     return {
+      ...funcHandler,
       // visitor functions for different types of nodes
       CallExpression(node) {
-        const findFunc = getFuncExpression(node);
-        if(findFunc && relationhandler.isContain(findFunc, node.callee)) {
-          const returnStatement = findReturnStatement(findFunc);
-          if(!(returnStatement && relationhandler.isPrev(returnStatement, node.callee))) {
-            context.report({
-              node,
-              messageId: 'someMessageId'
-            })
+        const findFuncNode = getFuncExpression(node);
+        if(findFuncNode) {
+          const returnStatement = findReturnStatement(findFuncNode);
+          if(!returnStatement
+            || relationhandler.isPrev(node.callee, returnStatement)
+            || relationhandler.isContain(returnStatement, node.callee)) {
+            diagraph.addFuncNode(findFuncNode);
           }
         }
       }

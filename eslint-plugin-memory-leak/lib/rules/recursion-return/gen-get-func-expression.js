@@ -1,16 +1,6 @@
 /* eslint-disable */
 const {genTraverse} = require('../../utils');
-
-const calleeTypeEnum = {
-  Identifier: 'Identifier',
-  MemberExpression: 'MemberExpression'
-}
-
-const funcTypeEnum = {
-    func: 'FunctionDeclaration',
-    arrowFunc: 'ArrowFunctionExpression',
-    funcExpression: 'FunctionExpression'
-}
+const {calleeTypeEnum, funcTypeEnum} = require('./const');
 
 const findNodeByName = (root, name) => {
     const findFunc = (scope) => {

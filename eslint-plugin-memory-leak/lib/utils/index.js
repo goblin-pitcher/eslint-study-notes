@@ -24,11 +24,11 @@ const genTraverse = (options = {}) => (node) => {
 
 const relationhandler = {
     isContain: (pNode, cNode) => {
-        return pNode.start <= cNode.start && cNode.end <= pNode.end
+        return pNode !== cNode && pNode.start <= cNode.start && cNode.end <= pNode.end
     },
     isPrev: (aNode, bNode) => {
         return aNode.end < bNode.start
-    }
+    },
 }
 
 const isDef = (val) => !!(val || val===0);
