@@ -2,15 +2,14 @@ const b=()=>{
 	fa()
 }
 function fa() {
-	
 	b()
 	const b = ()=>{}
 }
 
 const ff = () => {
 	const a = ff;
-	const b = a;
-	b()
+	const c = a;
+	c()
 }
 
 class Test {
@@ -37,10 +36,16 @@ function f1() {
 	f2()
 }
 function f2() {
-	f3(3)
+	f3(3);
+	return
+	f33()
 }
 
 function f3() {
+	f1()
+}
+
+function f33() {
 	f1()
 }
 

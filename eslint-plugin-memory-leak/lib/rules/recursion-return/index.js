@@ -60,7 +60,7 @@ module.exports = {
       CallExpression(node) {
         const findFuncNode = getFuncExpression(context, node);
         if(findFuncNode) {
-          const returnStatement = findReturnStatement(findFuncNode);
+          const returnStatement = findReturnStatement(diagraph.getActiveFunc());
           if(!returnStatement
             || !relationhandler.isPrev(returnStatement, node.callee)) {
             diagraph.addFuncNode(findFuncNode);

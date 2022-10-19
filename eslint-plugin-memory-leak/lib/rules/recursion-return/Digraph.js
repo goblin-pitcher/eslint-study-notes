@@ -48,9 +48,11 @@ class Diagraph {
         this.active = this.active.parent;
     }
 
-    getSetRecursion(node) {
+    getRecursionSet(node) {
         const st = new Set();
         const addRecursion = (nd) => {
+            // 这里st兼具banList的作用，不再次遍历已遍历过的node
+            if(st.has(nd)) return;
             st.add(nd);
             const item = this.map.get(nd);
             if(!item) return;
@@ -63,13 +65,17 @@ class Diagraph {
     }
     addFuncNode(node) {
         this.checkValidate(node);
-        const st = this.getSetRecursion(node);
+        const st = this.getRecursionSet(node);
         st.forEach(nd=>{
             if(relationhandler.isContain(this.active.value, nd)) return;
             this.active.usedNodeSet.add(nd)
         })
     }
     
+    getActiveFunc() {
+        return this.active.value;
+    }
+
     checkCycle() {
         // const path = []
         // const {active} = this
