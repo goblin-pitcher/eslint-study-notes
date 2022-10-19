@@ -35,7 +35,8 @@ module.exports = {
       obj[key] = (node) => {
         diagraph.goDown(node)
       }
-      obj[`${key}:exit`] = () => {
+      obj[`${key}:exit`] = (node) => {
+        diagraph.clearTodoNode(node);
         diagraph.back();
       }
       return obj;
@@ -63,7 +64,8 @@ module.exports = {
           const returnStatement = findReturnStatement(diagraph.getActiveFunc());
           if(!returnStatement
             || !relationhandler.isPrev(returnStatement, node.callee)) {
-            diagraph.addFuncNode(findFuncNode);
+            // diagraph.addFuncNode(findFuncNode);
+            diagraph.addFuncToNode(findFuncNode);
             const isCycle = diagraph.checkCycle();
             if(isCycle) {
               context.report({

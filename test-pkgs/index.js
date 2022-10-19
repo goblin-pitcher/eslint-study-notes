@@ -1,51 +1,25 @@
-const b=()=>{
-	fa()
-}
-function fa() {
-	b()
-	const b = ()=>{}
-}
-
-const ff = () => {
-	const a = ff;
-	const c = a;
-	c()
-}
-
-class Test {
-	f() {
-	  if(false){
-	  }
-		switch(a){
-			case 5: {}
-		}
-	
-	  for(let i=0;i<5;i++){
-	  }
-	  const a = this.f;
-	  const o = {f: {a}}
-	  return o.f.a()
-	  
-	   while(true) {
-		  return
-		}
-	}
-}
 
 function f1() {
 	f2()
 }
 function f2() {
 	f3(3);
-	return
-	f33()
 }
 
 function f3() {
-	f1()
+	f4()
 }
 
-function f33() {
+function f4() {
+	f5()
+}
+function f5() {
+	f6()
+}
+function f6() {
+	f7()
+}
+function f7() {
 	f1()
 }
 
