@@ -1,6 +1,6 @@
 const {relationhandler} = require('../../utils');
 const {findReturnStatement} = require('./utils');
-const genGetFuncExpression = require('./gen-get-func-expression');
+const getFuncExpression = require('./get-func-expression');
 const {funcTypeEnum} = require('./const')
 const Diagraph = require('./Digraph');
 /**
@@ -30,21 +30,13 @@ module.exports = {
   },
 
   create(context) {
-    const getFuncExpression = genGetFuncExpression(context);
     const diagraph = new Diagraph();
     const funcHandler = Object.values(funcTypeEnum).reduce((obj, key)=>{
       obj[key] = (node) => {
         diagraph.goDown(node)
       }
-      obj[`${key}:exit`] = (node) => {
-        const isCycle = diagraph.checkCycle();
-        if(isCycle) {
-          context.report({
-            node,
-            messageId: 'someMessageId'
-          })
-        }
-        diagraph.back(node);
+      obj[`${key}:exit`] = () => {
+        diagraph.back();
       }
       return obj;
     }, {})
@@ -66,13 +58,19 @@ module.exports = {
       ...funcHandler,
       // visitor functions for different types of nodes
       CallExpression(node) {
-        const findFuncNode = getFuncExpression(node);
+        const findFuncNode = getFuncExpression(context, node);
         if(findFuncNode) {
           const returnStatement = findReturnStatement(findFuncNode);
           if(!returnStatement
-            || relationhandler.isPrev(node.callee, returnStatement)
-            || relationhandler.isContain(returnStatement, node.callee)) {
+            || !relationhandler.isPrev(returnStatement, node.callee)) {
             diagraph.addFuncNode(findFuncNode);
+            const isCycle = diagraph.checkCycle();
+            if(isCycle) {
+              context.report({
+                node,
+                messageId: 'someMessageId'
+              })
+            }
           }
         }
       }

@@ -29,6 +29,9 @@ const relationhandler = {
     isPrev: (aNode, bNode) => {
         return aNode.end < bNode.start
     },
+    isDeclarePrev: (aNode, bNode) => {
+        return aNode !== bNode && aNode.start < bNode.start
+    }
 }
 
 const isDef = (val) => !!(val || val===0);

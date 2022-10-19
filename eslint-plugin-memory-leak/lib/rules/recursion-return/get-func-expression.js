@@ -1,25 +1,32 @@
 /* eslint-disable */
-const {genTraverse} = require('../../utils');
+const {genTraverse, relationhandler} = require('../../utils');
 const {calleeTypeEnum, funcTypeEnum} = require('./const');
 
-const findNodeByName = (root, name) => {
-    const findFunc = (scope) => {
-        const mp = scope.set || (new Map());
-        const findVal = mp.get(name);
-      	
-        if(findVal) {
-            return findVal.identifiers[0].parent.init || findVal.identifiers[0].parent;
+
+const getFuncExpression = (context, node) => {
+    let searchScope = context.getScope();
+    const findNodeByName = (root, name) => {
+        const isValidate = (findVal) => {
+            if(findVal.identifiers[0].parent && findVal.identifiers[0].parent.parent.type === 'VariableDeclaration') {
+                if(['const', 'let'].includes(findVal.identifiers[0].parent.parent.kind)) {
+                    return relationhandler.isDeclarePrev(findVal.identifiers[0].parent, node)
+                }
+            }
+            return true;
         }
-        return null;
+        const findFunc = (scope) => {
+            const mp = scope.set || (new Map());
+            const findVal = mp.get(name);
+        
+            if(findVal && isValidate(findVal)) {
+                searchScope = scope;
+                return findVal.identifiers[0].parent.init || findVal.identifiers[0].parent;
+            }
+            return null;
+        }
+        const ignoreFunc = (scope) => scope && scope.type === 'global';
+        return genTraverse({childKey: 'upper', findFunc, ignoreFunc, returnFindVal: true})(root);
     }
-    const ignoreFunc = (scope) => scope && scope.type === 'global';
-    return genTraverse({childKey: 'upper', findFunc, ignoreFunc, returnFindVal: true})(root);
-}
-
-
-
-
-const genGetFuncExpression = (context) => {
     const getObjectValue = (node, path = []) => {
         if(!node || node.type !== 'ObjectExpression') return null;
         let item = node;
@@ -62,8 +69,7 @@ const genGetFuncExpression = (context) => {
             }
             if(!node || node.type !== calleeTypeEnum.Identifier) return null;
 
-            const scope = context.getScope(node);
-            const findNode = findNodeByName(scope, node.name);
+            const findNode = findNodeByName(searchScope, node.name);
             if(!findNode) {
                 return null
             }
@@ -85,8 +91,7 @@ const genGetFuncExpression = (context) => {
                 findNode = classProperty.value;
               
             } else {
-                const scope = context.getScope();
-                findNode = findNodeByName(scope, id.name);
+                findNode = findNodeByName(searchScope, id.name);
                 if(!findNode) return null;
                 if(findNode.type === calleeTypeEnum.MemberExpression) {
                     findNode = findFuncHandler.MemberExpression(findNode);
@@ -101,13 +106,14 @@ const genGetFuncExpression = (context) => {
         }
     }
 
-    return (node) => {
+    const getFuncExp = () => {
         const { callee } = node || {};
         if(!Object.values(calleeTypeEnum).includes(callee.type)) return null;
         const defineNode = findFuncHandler.Identifier(callee) || findFuncHandler.MemberExpression(callee)
         return defineNode
-      }
+    }
+    return getFuncExp()
 }
 
 
-  module.exports = genGetFuncExpression;
+  module.exports = getFuncExpression;

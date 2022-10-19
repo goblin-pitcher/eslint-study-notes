@@ -1,3 +1,18 @@
+const b=()=>{
+	fa()
+}
+function fa() {
+	
+	b()
+	const b = ()=>{}
+}
+
+const ff = () => {
+	const a = ff;
+	const b = a;
+	b()
+}
+
 class Test {
 	f() {
 	  if(false){
