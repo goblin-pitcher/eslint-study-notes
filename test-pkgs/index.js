@@ -22,13 +22,20 @@ class Test {
 	
 	  for(let i=0;i<5;i++){
 	  }
-	  const a = this.f;
+	  const a = this.fa;
 	  const o = {f: {a}}
 	  return o.f.a()
 	  
 	   while(true) {
 		  return
 		}
+	}
+	fa() {
+		this.f()
+	}
+
+	k() {
+		this.k()
 	}
 }
 

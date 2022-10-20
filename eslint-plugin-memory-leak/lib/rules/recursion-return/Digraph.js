@@ -1,4 +1,3 @@
-const {relationhandler} = require('../../utils');
 const {funcTypeEnum} = require('./const')
 
 class Diagraph {
@@ -48,28 +47,9 @@ class Diagraph {
         this.active = this.active.parent;
     }
 
-    getRecursionSet(node) {
-        const st = new Set();
-        const addRecursion = (nd) => {
-            // 这里st兼具banList的作用，不再次遍历已遍历过的node
-            if(st.has(nd)) return;
-            st.add(nd);
-            const item = this.map.get(nd);
-            if(!item) return;
-            item.usedNodeSet.forEach(n=>{
-                addRecursion(n)
-            })
-        }
-        addRecursion(node);
-        return st;
-    }
     addFuncNode(node) {
         this.checkValidate(node);
-        const st = this.getRecursionSet(node);
-        st.forEach(nd=>{
-            if(relationhandler.isContain(this.active.value, nd)) return;
-            this.active.usedNodeSet.add(nd)
-        })
+        this.active.usedNodeSet.add(node);
     }
     
     getActiveFunc() {
@@ -77,15 +57,15 @@ class Diagraph {
     }
 
     checkCycle() {
-        // const path = []
-        // const {active} = this
-        // let checkNode = active;
-        // while(checkNode.usedNodeSet.size && !checkNode.usedNodeSet.has(active.value)) {
-        //     path.push(getName(checkNode.value))
-        //     checkNode = checkNode.parent
-        // }
-        // return path.length ? path : null
-        return this.active.usedNodeSet.has(this.active.value)
+        const findNode = this.active.value;
+        const banList = new Set();
+        const findRecursion = (checkItem) => {
+            if(!checkItem || banList.has(checkItem)) return false;
+            banList.add(checkItem);
+            if(checkItem.usedNodeSet.has(findNode)) return true;
+            return [...checkItem.usedNodeSet].some(nd=>findRecursion(this.map.get(nd)))
+        }
+        return findRecursion(this.active)
     }
 }
 

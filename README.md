@@ -5,8 +5,8 @@
 ```txt
 ├── eslint-study-nodes
 |   ├── eslint-plugin-memory-leak
-|   		└── lib/rules // 自定义规则
-|   				└── recursion-return // 递归调用时，递归环中必须有return
+|       └── lib/rules // 自定义规则
+|           └── recursion-return // 递归调用时，递归环中必须有return
 |   └── test-pkgs // 插件测试文件夹
 ```
 

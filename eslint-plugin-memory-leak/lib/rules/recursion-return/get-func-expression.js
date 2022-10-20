@@ -86,9 +86,11 @@ const getFuncExpression = (context, node) => {
             const {id, path, thisExpression} = info;
             let findNode;
             if(thisExpression) {
-                const classProperty = [...context.getAncestors()].reverse()
-                    .find(item=>["ClassProperty", 'MethodDefinition'].includes(item.type) && item.key.name === path[0])
-                findNode = classProperty.value;
+                const classBody = [...context.getAncestors()].reverse()
+                    .find(item => item.type === 'ClassBody')
+                if(!classBody) return null;
+                const classProperty = classBody.body.find(item=>["ClassProperty", 'MethodDefinition'].includes(item.type) && item.key.name === path[0])
+                findNode = classProperty && classProperty.value;
               
             } else {
                 findNode = findNodeByName(searchScope, id.name);
